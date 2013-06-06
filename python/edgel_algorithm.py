@@ -1,6 +1,5 @@
 from edgel_helper_func import *
-
-
+import operator
 
 def computeDocScore(skch, edgel_dic, edgel_ctr):
     score = list()
@@ -32,6 +31,34 @@ def computeDocScore(skch, edgel_dic, edgel_ctr):
     return score
 
 
+def computeDocScoreHash(skch, edgel_dic, edgel_ctr):
+    score = dict()
+    for i in range(0, len(edgel_ctr)):
+        score[i] = 0
+    
+    ornt_skch = cvtToOrntImg(skch)
+
+    rows, cols = ornt_skch.shape
+    TOL = 2
+    
+    for x in range(0, rows):
+        for y in range(0, cols):
+            val = ornt_skch[x, y]
+            if(val != 0.0):
+                for rx in range(maxOf(0, x - TOL), minOf(rows, x + TOL + 1)):
+                    for ry in range(maxOf(0, y - TOL), minOf(cols, y + TOL + 1)):
+                        key = int(rx * 10000 + ry * 10 + quantifiedAngle(val))
+                        if(edgel_dic.has_key(key)):
+                            for doc in edgel_dic.get(key):
+                                score[doc] = score[doc] + 1
+                        
+    for i in range(0, len(score)):
+        if(edgel_ctr[i] != 0):
+            score[i] = score[i] / float(edgel_ctr[i])
+        else:
+            score[i] = 0.0
+
+    return score
 
 def getTop100(skch, edgel_dic, edgel_ctr):
     
@@ -53,5 +80,17 @@ def getTop100(skch, edgel_dic, edgel_ctr):
     ret = top100[:100]
     return ret
 
+
+def getRanking(skch, edgel_dic, edgel_ctr):
+    
+    score = computeDocScoreHash(skch, edgel_dic, edgel_ctr)
+
+    rank = list()
+    rankScore = list()
+    for key, value in sorted(score.iteritems(),key=operator.itemgetter(1),reverse=True):
+        rank.append(key)
+        rankScore.append(value)
+
+    return rank, rankScore
 
 
