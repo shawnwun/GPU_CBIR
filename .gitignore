@@ -188,7 +188,7 @@ $RECYCLE.BIN/
 #############
 
 *.py[co]
-*.txt
+
 
 # Packages
 *.egg
@@ -214,3 +214,10 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+
+###############
+# my ignore list
+###############
+*.txt
+*.zip

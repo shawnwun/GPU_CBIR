@@ -1,7 +1,5 @@
 from edgel_helper_func import *
 import operator
-import math 
-from edgel_algorithm_2_ways import *
 
 def computeDocScore(skch, edgel_dic, edgel_ctr):
     score = list()
@@ -62,8 +60,6 @@ def computeDocScoreHash(skch, edgel_dic, edgel_ctr):
 
     return score
 
-
-
 def getTop100(skch, edgel_dic, edgel_ctr):
     
     score = computeDocScore(skch, edgel_dic, edgel_ctr)
@@ -96,4 +92,5 @@ def getRanking(skch, edgel_dic, edgel_ctr):
         rankScore.append(value)
 
     return rank, rankScore
+
 

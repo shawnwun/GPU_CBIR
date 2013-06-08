@@ -19,12 +19,4 @@ def loadEdgelCtr(file2):
     return edgel_counter
 
 
-def loadImgMap(file3):
-    img_map = dict()
-    for columns in ( row.strip().split() for row in file3 ):
-        key = int(columns[0])
-        edglist = list()
-        for edgID in columns[1:]:
-            edglist.append(int(edgID))
-        img_map[key] = edglist
-    return img_map
+

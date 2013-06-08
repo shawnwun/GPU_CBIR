@@ -158,6 +158,58 @@ void createEdgelDic(vector<string>& const ctr_names, map<int, Content_Vec>& edge
 }
 
 
+//output ctr_base to check the contour when retrieval
+//string filename version
+//add img_map for 2-way edgel computation
+void createEdgelDic2(vector<string>& const ctr_names, map<int, Content_Vec>& edgel_dic, vector<int>& edgel_counter, vector<Mat> & ctr_base, vector< vector<int> >& img_map)
+{
+	//read in all contours into contour base, ctr_base.
+	//vector<Mat> ctr_base(ctr_names.size());
+	for(int docID = 0; docID < ctr_names.size(); docID++)
+	{
+		Mat tmp = imread(ctr_names[docID], 0);//resizeToN(imread(ctr_names[docID], 0), 200);
+		//imshow("ctr_base" ,tmp);
+		threshold(tmp, ctr_base[docID], 220, 255, THRESH_BINARY_INV);
+		
+		//namedWindow("threshold", CV_WINDOW_NORMAL);
+		//imshow("threshold", ctr_base[docID]);
+		//waitKey();
+	}
+
+	//cout << endl << "	Start inserting edgel dicitonary entries..." << endl;
+
+	//for every contour image
+	for(int docID = 0; docID < ctr_base.size(); docID++)
+	{
+		//cout << "	Processing edgel entries of contour image (docID = " << docID << ").." << endl;
+
+		//convert this contour image to orientation image
+		cvtToOrntImg(ctr_base[docID]);
+
+		//initialize counter
+		edgel_counter[docID] = 0;
+
+		//for every edgel in the ornt img
+		for(int x = 0; x < ctr_base[docID].rows; x++)
+		{
+			for(int y = 0; y < ctr_base[docID].cols; y++)
+			{
+				//val is the value of orientation at (x, y)
+				double val = ctr_base[docID].at<float>(x, y);
+				if (val != 0.0)
+				{
+					Edgel egl(x, y, quantifiedAngle(val));
+					edgel_dic[egl.idx()].push_back(docID);
+					edgel_counter[docID]++;
+					img_map[docID].push_back(egl.idx());
+				}
+			}
+		}
+	}
+
+}
+
+
 void cvtToOrntImg(Mat& src)
 {
 	Mat dx, dy;
@@ -246,6 +298,24 @@ void makeEdgelCtrFile(vector<int>& edgel_ctr)
 	for(int i = 0; i < edgel_ctr.size(); i++)
 	{
 		myfile << i << " " << edgel_ctr[i];
+		myfile << endl;
+
+	}
+}
+
+
+void makeImgMapFile(vector< vector<int> >& img_map)
+{
+	ofstream myfile;
+	myfile.open("img_map.txt");
+	cout << "writing img map" << endl;
+	for(int i = 0; i < img_map.size(); i++)
+	{
+		myfile << i << " ";
+		for(vector<int>::iterator iter = img_map[i].begin(); iter != img_map[i].end(); iter++)
+		{
+			myfile << (*iter) << " ";
+		}
 		myfile << endl;
 
 	}
